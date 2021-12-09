@@ -1,0 +1,23 @@
+---
+layout: ""
+page_title: "Provider: Stim"
+description: |-
+  The Stim provider provides configuration management resources for Kubernetes clusters and other resources managed through Stim.
+---
+
+# Stim Provider
+
+The Stim provider provides configuration management resources for
+[Stim](https://stim.dev/).
+
+## Example Usage
+
+{{ tffile "examples/provider/provider.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
+
+## Authentication
+
+### `auth`
+
+Authentication is done using a Stim API key. They can be generated through the web UI.
