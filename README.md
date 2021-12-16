@@ -1,7 +1,7 @@
 # Terraform Provider for Stim
 
 - Stim website: https://stim.dev
-- Provider Documentation: https://registry.terraform.io/providers/stim/stim/latest/docs
+- Provider Documentation: https://registry.terraform.io/providers/stim-cloud/stim/latest/docs
 
 Run the following command to build the provider
 
