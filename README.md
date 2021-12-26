@@ -1,12 +1,12 @@
-# Terraform Provider for Stim
+# Terraform Provider for Symbiosis
 
-- Stim website: https://stim.dev
-- Provider Documentation: https://registry.terraform.io/providers/stim-cloud/stim/latest/docs
+- Symbiosis website: https://symbiosis.host
+- Provider Documentation: https://registry.terraform.io/providers/symbiosis-cloud/symbiosis/latest/docs
 
 Run the following command to build the provider
 
 ```shell
-go build -o terraform-provider-stim
+go build -o terraform-provider-symbiosis
 ```
 
 ## Test sample configuration

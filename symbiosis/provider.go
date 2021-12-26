@@ -1,4 +1,4 @@
-package stim
+package symbiosis
 
 import (
 	"context"
@@ -16,27 +16,27 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Required:    true,
 				Sensitive:   true,
-				DefaultFunc: schema.EnvDefaultFunc("STIM_API_KEY", nil),
-				Description: "The ApiKey used to authenticate requests towards Stim.",
+				DefaultFunc: schema.EnvDefaultFunc("SYMBIOSIS_API_KEY", nil),
+				Description: "The ApiKey used to authenticate requests towards Symbiosis.",
 			},
 			"endpoint": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("STIM_ENDPOINT", "https://api.stim.dev"),
-				Description: "Endpoint for reaching the stim API. Used for debugging or when accessed through a proxy.",
+				DefaultFunc: schema.EnvDefaultFunc("SYMBIOSIS_ENDPOINT", "https://api.symbiosis.host"),
+				Description: "Endpoint for reaching the symbiosis API. Used for debugging or when accessed through a proxy.",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"stim_cluster":     ResourceCluster(),
-			"stim_team_member": ResourceTeamMember(),
+			"symbiosis_cluster":     ResourceCluster(),
+			"symbiosis_team_member": ResourceTeamMember(),
 		},
 		DataSourcesMap:       map[string]*schema.Resource{},
 		ConfigureContextFunc: configureContext,
 	}
 }
 
-type StimClient struct {
-	stimApi *resty.Client
+type SymbiosisClient struct {
+	symbiosisApi *resty.Client
 }
 
 type NodePool struct {
@@ -61,19 +61,19 @@ type TeamMemberInvitation struct {
 }
 
 func configureContext(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	c := &StimClient{}
+	c := &SymbiosisClient{}
 	endpoint := d.Get("endpoint").(string)
 	apiKey := d.Get("api_key").(string)
-	c.stimApi = resty.New().SetHostURL(endpoint).SetHeader("X-Auth-ApiKey", apiKey).SetHeader("Content-Type", "application/json").SetHeader("Accept", "application/json")
+	c.symbiosisApi = resty.New().SetHostURL(endpoint).SetHeader("X-Auth-ApiKey", apiKey).SetHeader("Content-Type", "application/json").SetHeader("Accept", "application/json")
 
   // Verify that api key is valid and has connectivity to API gateway
-  resp, err := c.stimApi.R().SetError(StimApiError{}).ForceContentType("application/json").Get("rest/v1/cluster")
+  resp, err := c.symbiosisApi.R().SetError(SymbiosisApiError{}).ForceContentType("application/json").Get("rest/v1/cluster")
   if err != nil {
     return c, diag.FromErr(err)
   }
   if resp.StatusCode() != 200 {
-		stimErr := resp.Error().(*StimApiError)
-    return c, diag.FromErr(stimErr)
+		symbiosisErr := resp.Error().(*SymbiosisApiError)
+    return c, diag.FromErr(symbiosisErr)
   }
 
 	var diags diag.Diagnostics

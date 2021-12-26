@@ -1,20 +1,20 @@
 ---
 layout: ""
-page_title: "Provider: Stim"
+page_title: "Provider: Symbiosis"
 description: |-
-  The Stim provider provides configuration management resources for Kubernetes clusters and other resources managed through Stim.
+  The Symbiosis provider provides configuration management resources for Kubernetes clusters and other resources managed through Symbiosis.
 ---
 
-# Stim Provider
+# Symbiosis Provider
 
-The Stim provider provides configuration management resources for
-[Stim](https://stim.dev/).
+The Symbiosis provider provides configuration management resources for
+[Symbiosis](https://symbiosis.host/).
 
 ## Example Usage
 
 ```terraform
-provider "stim" {
-  api_key = var.stim_api_key
+provider "symbiosis" {
+  api_key = var.symbiosis_api_key
 }
 ```
 
@@ -23,14 +23,14 @@ provider "stim" {
 
 ### Required
 
-- **api_key** (String, Sensitive) The ApiKey used to authenticate requests towards Stim.
+- **api_key** (String, Sensitive) The ApiKey used to authenticate requests towards Symbiosis.
 
 ### Optional
 
-- **endpoint** (String) Endpoint for reaching the stim API. Used for debugging or when accessed through a proxy.
+- **endpoint** (String) Endpoint for reaching the symbiosis API. Used for debugging or when accessed through a proxy.
 
 ## Authentication
 
 ### `auth`
 
-Authentication is done using a Stim API key. They can be generated through the web UI.
+Authentication is done using a Symbiosis API key. They can be generated through the web UI.

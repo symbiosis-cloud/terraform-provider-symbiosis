@@ -1,4 +1,4 @@
-package stim
+package symbiosis
 
 import (
   "context"
@@ -86,8 +86,8 @@ type PutNodePoolByTypeInput struct {
 func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
   log.Printf("[DEBUG] Creating cluster: %s", d.Get("name").(string))
 	var diags diag.Diagnostics
-	client := meta.(*StimClient)
-	api := client.stimApi
+	client := meta.(*SymbiosisClient)
+	api := client.symbiosisApi
   nodes := d.Get("nodes").([]interface{})
   nodeInput := []ClusterNodeInput{}
 
@@ -106,14 +106,14 @@ func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta int
 		Nodes:  nodeInput,
 	}
 
-	resp, err := api.R().SetBody(input).SetResult(PostClusterPayload{}).SetError(StimApiError{}).ForceContentType("application/json").Post("rest/v1/cluster")
+	resp, err := api.R().SetBody(input).SetResult(PostClusterPayload{}).SetError(SymbiosisApiError{}).ForceContentType("application/json").Post("rest/v1/cluster")
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	if resp.StatusCode() != 200 {
-		stimErr := resp.Error().(*StimApiError)
-    if stimErr.Message != "" {
-      return diag.FromErr(stimErr)
+		symbiosisErr := resp.Error().(*SymbiosisApiError)
+    if symbiosisErr.Message != "" {
+      return diag.FromErr(symbiosisErr)
     }
     return append(diags, diag.Diagnostic{
       Severity: diag.Error,
@@ -147,7 +147,7 @@ func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta int
 func resourceClusterUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
   log.Printf("[DEBUG] Updating cluster: %s", d.Id())
 	var diags diag.Diagnostics
-	client := meta.(*StimClient).stimApi
+	client := meta.(*SymbiosisClient).symbiosisApi
   if d.HasChange("nodes") {
     newNodes := d.Get("nodes").([]interface{})
     for _, item := range newNodes {
@@ -155,14 +155,14 @@ func resourceClusterUpdate(ctx context.Context, d *schema.ResourceData, meta int
       input := PutNodePoolByTypeInput{
         Quantity: newNode["quantity"].(int),
       }
-      resp, err := client.R().SetError(StimApiError{}).SetBody(input).ForceContentType("application/json").Put(fmt.Sprintf("rest/v1/cluster/%v/node-pool/type/%s", d.Id(), newNode["node_type"]))
+      resp, err := client.R().SetError(SymbiosisApiError{}).SetBody(input).ForceContentType("application/json").Put(fmt.Sprintf("rest/v1/cluster/%v/node-pool/type/%s", d.Id(), newNode["node_type"]))
       if err != nil {
         return diag.FromErr(err)
       }
       if resp.StatusCode() != 200 {
-        stimErr := resp.Error().(*StimApiError)
-        if stimErr.Message != "" {
-          return diag.FromErr(stimErr)
+        symbiosisErr := resp.Error().(*SymbiosisApiError)
+        if symbiosisErr.Message != "" {
+          return diag.FromErr(symbiosisErr)
         }
         return append(diags, diag.Diagnostic{
           Severity: diag.Error,
@@ -177,16 +177,16 @@ func resourceClusterUpdate(ctx context.Context, d *schema.ResourceData, meta int
 
 func resourceClusterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
   log.Printf("[DEBUG] Deleting cluster: %s", d.Id())
-	client := meta.(*StimClient)
-	api := client.stimApi
-	resp, err := api.R().SetError(StimApiError{}).ForceContentType("application/json").Delete(fmt.Sprintf("rest/v1/cluster/%v", d.Id()))
+	client := meta.(*SymbiosisClient)
+	api := client.symbiosisApi
+	resp, err := api.R().SetError(SymbiosisApiError{}).ForceContentType("application/json").Delete(fmt.Sprintf("rest/v1/cluster/%v", d.Id()))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	if resp.StatusCode() != 200 {
-		stimErr := resp.Error().(*StimApiError)
-		if stimErr.Message != "" {
-			return diag.FromErr(stimErr)
+		symbiosisErr := resp.Error().(*SymbiosisApiError)
+		if symbiosisErr.Message != "" {
+			return diag.FromErr(symbiosisErr)
 		}
 		return diag.FromErr(err)
 	}
@@ -213,7 +213,7 @@ func resourceClusterDelete(ctx context.Context, d *schema.ResourceData, meta int
 
 func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
   log.Printf("[DEBUG] Reading cluster: %s", d.Id())
-	client := meta.(*StimClient)
+	client := meta.(*SymbiosisClient)
 	cluster, err := client.describeCluster(d.Id())
 	if err != nil {
 		return diag.FromErr(err)

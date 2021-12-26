@@ -1,4 +1,4 @@
-module github.com/styren/terraform-provider-stim
+module github.com/styren/terraform-provider-symbiosis
 
 go 1.16
 

@@ -1,6 +1,6 @@
-resource "stim_cluster" {
+resource "symbiosis_cluster" {
   name = "my-staging-cluster"
-  region = "eu-germany-1"
+  region = "germany-1"
   
   nodes {
     node_type = "int-general-1"

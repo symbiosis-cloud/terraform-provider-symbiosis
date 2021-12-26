@@ -1,7 +1,7 @@
 TEST?=$$(go list ./... | grep -v 'vendor')
-HOSTNAME=stim.xyz
-NAMESPACE=stim
-NAME=stim
+HOSTNAME=symbiosis.host
+NAMESPACE=symbiosis
+NAME=symbiosis
 BINARY=terraform-provider-${NAME}
 VERSION=0.1
 OS_ARCH=darwin_arm64

@@ -1,4 +1,4 @@
-package stim
+package symbiosis
 
 import (
 	"context"
@@ -50,7 +50,7 @@ type PutTeamMemberInput struct {
 }
 
 func resourceTeamMemberCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	api := meta.(*StimClient).stimApi
+	api := meta.(*SymbiosisClient).symbiosisApi
   email := d.Get("email").(string)
 	input := &PostTeamMemberInput{
 		Emails: []string{
@@ -58,14 +58,14 @@ func resourceTeamMemberCreate(ctx context.Context, d *schema.ResourceData, meta 
 		},
 		Role: d.Get("role").(string),
 	}
-	resp, err := api.R().SetBody(input).SetError(StimApiError{}).ForceContentType("application/json").Post("rest/v1/team/member/invite")
+	resp, err := api.R().SetBody(input).SetError(SymbiosisApiError{}).ForceContentType("application/json").Post("rest/v1/team/member/invite")
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	if resp.StatusCode() != 200 {
-		stimErr := resp.Error().(*StimApiError)
-		if stimErr.Message != "" {
-			return diag.FromErr(stimErr)
+		symbiosisErr := resp.Error().(*SymbiosisApiError)
+		if symbiosisErr.Message != "" {
+			return diag.FromErr(symbiosisErr)
 		}
 		return diag.FromErr(err)
 	}
@@ -75,12 +75,12 @@ func resourceTeamMemberCreate(ctx context.Context, d *schema.ResourceData, meta 
 }
 
 func resourceTeamMemberUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-  api := meta.(*StimClient).stimApi
+  api := meta.(*SymbiosisClient).symbiosisApi
   if d.HasChange("role") {
     input := &PutTeamMemberInput{
       Role: d.Get("role").(string),
     }
-    _, err := api.R().SetBody(input).SetError(StimApiError{}).ForceContentType("application/json").Post(fmt.Sprintf("rest/v1/team/member/%v", d.Id()))
+    _, err := api.R().SetBody(input).SetError(SymbiosisApiError{}).ForceContentType("application/json").Post(fmt.Sprintf("rest/v1/team/member/%v", d.Id()))
     if err != nil {
       return diag.FromErr(err)
     }
@@ -90,15 +90,15 @@ func resourceTeamMemberUpdate(ctx context.Context, d *schema.ResourceData, meta 
 }
 
 func resourceTeamMemberDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	api := meta.(*StimClient).stimApi
-	resp, err := api.R().SetError(StimApiError{}).ForceContentType("application/json").Delete(fmt.Sprintf("rest/v1/team/member/%v", d.Id()))
+	api := meta.(*SymbiosisClient).symbiosisApi
+	resp, err := api.R().SetError(SymbiosisApiError{}).ForceContentType("application/json").Delete(fmt.Sprintf("rest/v1/team/member/%v", d.Id()))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	if resp.StatusCode() != 200 {
-		stimErr := resp.Error().(*StimApiError)
-		if stimErr.Message != "" {
-			return diag.FromErr(stimErr)
+		symbiosisErr := resp.Error().(*SymbiosisApiError)
+		if symbiosisErr.Message != "" {
+			return diag.FromErr(symbiosisErr)
 		}
 		return diag.FromErr(err)
 	}
@@ -107,7 +107,7 @@ func resourceTeamMemberDelete(ctx context.Context, d *schema.ResourceData, meta 
 }
 
 func resourceTeamMemberRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*StimClient)
+	client := meta.(*SymbiosisClient)
 	member, err := client.describeTeamMember(d.Id())
   var diags diag.Diagnostics
 	if err != nil {
