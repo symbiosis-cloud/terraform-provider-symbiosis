@@ -13,19 +13,9 @@ Manages Kubernetes clusters.
 ## Example Usage
 
 ```terraform
-resource "symbiosis_cluster" {
-  name = "my-staging-cluster"
-  region = "eu-germany-1"
-  
-  nodes {
-    node_type = "int-general-1"
-    quantity = 6
-  }
-
-  nodes {
-    node_type = "int-memory-2"
-    quantity = 10
-  }
+resource "symbiosis_cluster" "example" {
+  name = "my-production-cluster"
+  region = "germany-1"
 }
 ```
 
@@ -39,21 +29,18 @@ resource "symbiosis_cluster" {
 
 ### Optional
 
+- **configuration** (Block Set) (see [below for nested schema](#nestedblock--configuration))
 - **id** (String) The ID of this resource.
-- **nodes** (Block List) (see [below for nested schema](#nestedblock--nodes))
 - **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- **wait_until_initialized** (Boolean) Wait until Kubernetes cluster is initialized.
 
-<a id="nestedblock--nodes"></a>
-### Nested Schema for `nodes`
+<a id="nestedblock--configuration"></a>
+### Nested Schema for `configuration`
 
-Required:
+Optional:
 
-- **node_type** (String)
-- **quantity** (Number)
-
-Read-Only:
-
-- **id** (String) The ID of this resource.
+- **enable_csi_driver** (Boolean)
+- **enable_nginx_ingress** (Boolean)
 
 
 <a id="nestedblock--timeouts"></a>

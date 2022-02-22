@@ -7,8 +7,9 @@ description: |-
 
 # Symbiosis Provider
 
-The Symbiosis provider provides configuration management resources for
-[Symbiosis](https://symbiosis.host/).
+[Symbiosis](https://symbiosis.host/) is a Managed Kubernetes services.
+
+The Symbiosis provider provides resources for provisioning Kubernetes clusters, node pools and other objects.
 
 ## Example Usage
 

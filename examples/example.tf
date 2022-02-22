@@ -6,7 +6,7 @@ resource "symbiosis_cluster" "production" {
   name = "production-cluster"
   region = "germany-1"
   
-  nodes {
+  node_pool {
     node_type = "int-general-1"
     quantity = 6
   }

@@ -11,6 +11,9 @@ default: install
 build:
 	go build -o ${BINARY}
 
+docs:
+	tfplugindocs
+
 release:
 	GOOS=darwin GOARCH=arm64 go build -o ./bin/${BINARY}_${VERSION}_darwin_arm64
 	GOOS=freebsd GOARCH=386 go build -o ./bin/${BINARY}_${VERSION}_freebsd_386
