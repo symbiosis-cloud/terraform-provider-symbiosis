@@ -54,7 +54,7 @@ func (client *SymbiosisClient) describeCluster(name string) (*Cluster, error) {
 
 func (client *SymbiosisClient) describeNodePool(id string) (*NodePool, error) {
 	api := client.symbiosisApi
-	resp, err := api.R().SetResult(NodePool{}).ForceContentType("application/json").Get(fmt.Sprintf("rest/v1/node-pool/%v", id))
+	resp, err := api.R().SetResult(NodePool{}).ForceContentType("application/json").Get(fmt.Sprintf("rest/v1/node-pool/%s", id))
 	if err != nil {
 		var NodePool NodePool
 		return &NodePool, err

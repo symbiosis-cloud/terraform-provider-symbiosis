@@ -1,15 +1,17 @@
 provider "symbiosis" {
-  api_key = var.symbiosis_api_key
+  api_key = "YOUR_SYMBIOSIS_API_KEY"
 }
 
 resource "symbiosis_cluster" "production" {
   name = "production-cluster"
   region = "germany-1"
+}
+
+resource "symbiosis_node_pool" "example" {
+  cluster = symbiosis_cluster.production.name
   
-  node_pool {
-    node_type = "int-general-1"
-    quantity = 6
-  }
+  node_type = "general-int-1"
+  quantity = 6
 }
 
 resource "symbiosis_team_member" "admins" {
