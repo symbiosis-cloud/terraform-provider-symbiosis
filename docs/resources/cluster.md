@@ -31,6 +31,7 @@ resource "symbiosis_cluster" "example" {
 
 - **configuration** (Block Set) (see [below for nested schema](#nestedblock--configuration))
 - **id** (String) The ID of this resource.
+- **kube_version** (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
 - **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - **wait_until_initialized** (Boolean) Wait until Kubernetes cluster is initialized.
 
