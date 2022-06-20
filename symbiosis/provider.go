@@ -2,11 +2,10 @@ package symbiosis
 
 import (
 	"context"
-
-	"github.com/go-resty/resty/v2"
-
+	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/symbiosis-cloud/symbiosis-go"
 )
 
 func Provider() *schema.Provider {
@@ -36,24 +35,24 @@ func Provider() *schema.Provider {
 	}
 }
 
-type SymbiosisClient struct {
-	symbiosisApi *resty.Client
-}
-
 func configureContext(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	c := &SymbiosisClient{}
+
 	endpoint := d.Get("endpoint").(string)
 	apiKey := d.Get("api_key").(string)
-	c.symbiosisApi = resty.New().SetHostURL(endpoint).SetHeader("X-Auth-ApiKey", apiKey).SetHeader("Content-Type", "application/json").SetHeader("Accept", "application/json")
+
+	c, err := symbiosis.NewClientFromAPIKey(apiKey, symbiosis.WithEndpoint(endpoint))
+
+	if err != nil {
+		return nil, diag.FromErr(err)
+	}
 
 	// Verify that api key is valid and has connectivity to API gateway
-	resp, err := c.symbiosisApi.R().SetError(SymbiosisApiError{}).ForceContentType("application/json").Get("rest/v1/cluster")
+	clusters, err := c.Cluster.List(10, 0)
 	if err != nil {
 		return c, diag.FromErr(err)
 	}
-	if resp.StatusCode() != 200 {
-		symbiosisErr := resp.Error().(*SymbiosisApiError)
-		return c, diag.FromErr(symbiosisErr)
+	if clusters == nil {
+		return c, diag.FromErr(errors.New("Failed to read API result"))
 	}
 
 	var diags diag.Diagnostics

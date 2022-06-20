@@ -2,11 +2,11 @@ package symbiosis
 
 import (
 	"context"
-	"fmt"
-	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/symbiosis-cloud/symbiosis-go"
+	"log"
 )
 
 func ResourceTeamMember() *schema.Resource {
@@ -40,47 +40,26 @@ func ResourceTeamMember() *schema.Resource {
 	}
 }
 
-type PostTeamMemberInput struct {
-	Emails []string `json:"emails"`
-	Role   string   `json:"role"`
-}
-
-type PutTeamMemberInput struct {
-	Role string `json:"role"`
-}
-
 func resourceTeamMemberCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	api := meta.(*SymbiosisClient).symbiosisApi
+	client := meta.(*symbiosis.Client)
 	email := d.Get("email").(string)
-	input := &PostTeamMemberInput{
-		Emails: []string{
-			email,
-		},
-		Role: d.Get("role").(string),
-	}
-	resp, err := api.R().SetBody(input).SetError(SymbiosisApiError{}).ForceContentType("application/json").Post("rest/v1/team/member/invite")
+
+	_, err := client.Team.InviteMembers([]string{email}, d.Get("role").(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if resp.StatusCode() != 200 {
-		symbiosisErr := resp.Error().(*SymbiosisApiError)
-		if symbiosisErr.Message != "" {
-			return diag.FromErr(symbiosisErr)
-		}
-		return diag.FromErr(err)
-	}
+
 	d.SetId(email)
 	var diags diag.Diagnostics
 	return diags
 }
 
 func resourceTeamMemberUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	api := meta.(*SymbiosisClient).symbiosisApi
+	client := meta.(*symbiosis.Client)
 	if d.HasChange("role") {
-		input := &PutTeamMemberInput{
-			Role: d.Get("role").(string),
-		}
-		_, err := api.R().SetBody(input).SetError(SymbiosisApiError{}).ForceContentType("application/json").Post(fmt.Sprintf("rest/v1/team/member/%v", d.Id()))
+
+		err := client.Team.ChangeRole(d.Id(), d.Get("role").(string))
+
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -90,25 +69,21 @@ func resourceTeamMemberUpdate(ctx context.Context, d *schema.ResourceData, meta 
 }
 
 func resourceTeamMemberDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	api := meta.(*SymbiosisClient).symbiosisApi
-	resp, err := api.R().SetError(SymbiosisApiError{}).ForceContentType("application/json").Delete(fmt.Sprintf("rest/v1/team/member/%v", d.Id()))
+	client := meta.(*symbiosis.Client)
+
+	err := client.Team.DeleteMember(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if resp.StatusCode() != 200 {
-		symbiosisErr := resp.Error().(*SymbiosisApiError)
-		if symbiosisErr.Message != "" {
-			return diag.FromErr(symbiosisErr)
-		}
-		return diag.FromErr(err)
-	}
+
 	var diags diag.Diagnostics
 	return diags
 }
 
 func resourceTeamMemberRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*SymbiosisClient)
-	member, err := client.describeTeamMember(d.Id())
+	client := meta.(*symbiosis.Client)
+
+	member, err := client.Team.GetMemberByEmail(d.Id())
 	var diags diag.Diagnostics
 	if err != nil {
 		return diag.FromErr(err)
@@ -121,7 +96,7 @@ func resourceTeamMemberRead(ctx context.Context, d *schema.ResourceData, meta in
 		return diags
 	}
 
-	invitation, err := client.describeTeamMemberInvitation(d.Id())
+	invitation, err := client.Team.GetInvitationByEmail(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}

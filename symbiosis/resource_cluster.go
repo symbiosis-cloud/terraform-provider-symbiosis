@@ -3,10 +3,9 @@ package symbiosis
 import (
 	"context"
 	"fmt"
+	"github.com/symbiosis-cloud/symbiosis-go"
 	"log"
 	"time"
-
-	"github.com/google/uuid"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -60,12 +59,6 @@ func ResourceCluster() *schema.Resource {
 							ForceNew: true,
 							Optional: true,
 						},
-						"enable_csi_driver": {
-							Type:     schema.TypeBool,
-							Default:  false,
-							ForceNew: true,
-							Optional: true,
-						},
 					},
 				},
 			},
@@ -76,80 +69,41 @@ func ResourceCluster() *schema.Resource {
 	}
 }
 
-type ClusterNodeInput struct {
-	NodeType string `json:"nodeTypeName"`
-	Quantity int    `json:"quantity"`
-}
-
-type ClusterConfigurationInput struct {
-	EnableCsiDriver    bool `json:"nginxIngress"`
-	EnableNginxIngress bool `json:"csiDriver"`
-}
-
-type PostClusterInput struct {
-	Name          string                    `json:"name"`
-	KubeVersion   string                    `json:"kubeVersion"`
-	Region        string                    `json:"regionName"`
-	Nodes         []ClusterNodeInput        `json:"nodes"`
-	Configuration ClusterConfigurationInput `json:"configuration"`
-}
-
-type PostClusterPayload struct {
-	Id   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
-}
-
-type PutNodePoolByTypeInput struct {
-	Quantity int `json:"quantity"`
-}
-
 func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Creating cluster: %s", d.Get("name").(string))
 	var diags diag.Diagnostics
-	client := meta.(*SymbiosisClient)
-	api := client.symbiosisApi
+	client := meta.(*symbiosis.Client)
 
-	configurationInput := ClusterConfigurationInput{
-		EnableCsiDriver:    d.Get("configuration.0.enable_csi_driver").(bool),
+	configurationInput := symbiosis.ClusterConfigurationInput{
 		EnableNginxIngress: d.Get("configuration.0.enable_nginx_ingress").(bool),
 	}
 
-	input := &PostClusterInput{
+	input := &symbiosis.ClusterInput{
 		Name:          d.Get("name").(string),
 		Region:        d.Get("region").(string),
 		KubeVersion:   d.Get("kube_version").(string),
-		Nodes:         []ClusterNodeInput{},
+		Nodes:         []symbiosis.ClusterNodeInput{},
 		Configuration: configurationInput,
 	}
 
-	resp, err := api.R().SetBody(input).SetResult(PostClusterPayload{}).SetError(SymbiosisApiError{}).ForceContentType("application/json").Post("rest/v1/cluster")
+	cluster, err := client.Cluster.Create(input)
+
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if resp.StatusCode() != 200 {
-		symbiosisErr := resp.Error().(*SymbiosisApiError)
-		if symbiosisErr.Message != "" {
-			return diag.FromErr(symbiosisErr)
-		}
-		return append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Unable to create cluster",
-			Detail:   "Unknown error",
-		})
-	}
-	json := resp.Result().(*PostClusterPayload)
-	d.SetId(json.Name)
+
+	d.SetId(cluster.Name)
 
 	if d.Get("wait_until_initialized").(bool) {
 		err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-			resp, err := client.describeCluster(json.Name)
+			c, err := client.Cluster.Describe(cluster.Name)
 
 			if err != nil {
 				return resource.NonRetryableError(fmt.Errorf("Error describing cluster: %s", err))
 			}
 
-			if resp.State != "ACTIVE" {
-				return resource.RetryableError(fmt.Errorf("expected instance to be active but was in state %s", resp.State))
+			if c.State != "ACTIVE" {
+				return resource.RetryableError(fmt.Errorf("expected instance to be active but was in state %s", c.State))
 			}
 
 			return nil
@@ -164,29 +118,23 @@ func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta int
 
 func resourceClusterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Deleting cluster: %s", d.Id())
-	client := meta.(*SymbiosisClient)
-	api := client.symbiosisApi
-	resp, err := api.R().SetError(SymbiosisApiError{}).ForceContentType("application/json").Delete(fmt.Sprintf("rest/v1/cluster/%v", d.Id()))
+	client := meta.(*symbiosis.Client)
+
+	err := client.Cluster.Delete(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if resp.StatusCode() != 200 {
-		symbiosisErr := resp.Error().(*SymbiosisApiError)
-		if symbiosisErr.Message != "" {
-			return diag.FromErr(symbiosisErr)
-		}
-		return diag.FromErr(err)
-	}
+
 	var diags diag.Diagnostics
 	if d.Get("wait_until_initialized").(bool) {
 		err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-			resp, err := client.describeCluster(d.Id())
+			c, err := client.Cluster.Describe(d.Id())
 
 			if err != nil {
 				return resource.NonRetryableError(fmt.Errorf("Error describing cluster: %s", err))
 			}
 
-			if resp != nil {
+			if c != nil {
 				return resource.RetryableError(fmt.Errorf("expected cluster to get removed but cluster is still returned from api"))
 			}
 
@@ -202,8 +150,9 @@ func resourceClusterDelete(ctx context.Context, d *schema.ResourceData, meta int
 
 func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Reading cluster: %s", d.Id())
-	client := meta.(*SymbiosisClient)
-	cluster, err := client.describeCluster(d.Id())
+	client := meta.(*symbiosis.Client)
+
+	cluster, err := client.Cluster.Describe(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
