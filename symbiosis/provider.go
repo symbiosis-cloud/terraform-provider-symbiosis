@@ -3,6 +3,7 @@ package symbiosis
 import (
 	"context"
 	"errors"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/symbiosis-cloud/symbiosis-go"
@@ -26,9 +27,10 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"symbiosis_cluster":     ResourceCluster(),
-			"symbiosis_node_pool":   ResourceNodePool(),
-			"symbiosis_team_member": ResourceTeamMember(),
+			"symbiosis_cluster":                 ResourceCluster(),
+			"symbiosis_node_pool":               ResourceNodePool(),
+			"symbiosis_team_member":             ResourceTeamMember(),
+			"symbiosis_cluster_service_account": ResourceClusterServiceAccount(),
 		},
 		DataSourcesMap:       map[string]*schema.Resource{},
 		ConfigureContextFunc: configureContext,

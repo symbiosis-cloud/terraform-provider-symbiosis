@@ -24,15 +24,12 @@ resource "symbiosis_team_member" "example" {
 
 ### Required
 
-- **email** (String) User email to invite. Adding an team member will send the user an invitation. Deleting a team member will either delete the invitation or the user depending on whether the user has accepted the invitation.
-- **role** (String) User role. Valid values include [MEMBER, ADMIN].
-
-### Optional
-
-- **id** (String) The ID of this resource.
+- `email` (String) User email to invite. Adding an team member will send the user an invitation. Deleting a team member will either delete the invitation or the user depending on whether the user has accepted the invitation.
+- `role` (String) User role. Valid values include [MEMBER, ADMIN].
 
 ### Read-Only
 
-- **accepted_invitation** (String) Whether the user has accepted the invitation to the team.
+- `accepted_invitation` (String) Whether the user has accepted the invitation to the team.
+- `id` (String) The ID of this resource.
 
 

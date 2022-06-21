@@ -24,24 +24,27 @@ resource "symbiosis_cluster" "example" {
 
 ### Required
 
-- **name** (String) Cluster name. Changing the name forces re-creation.
-- **region** (String) Cluster region, valid values: [eu-germany-1].
+- `name` (String) Cluster name. Changing the name forces re-creation.
+- `region` (String)
 
 ### Optional
 
-- **configuration** (Block Set) (see [below for nested schema](#nestedblock--configuration))
-- **id** (String) The ID of this resource.
-- **kube_version** (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
-- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- **wait_until_initialized** (Boolean) Wait until Kubernetes cluster is initialized.
+- `configuration` (Block Set) (see [below for nested schema](#nestedblock--configuration))
+- `kube_version` (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- `wait_until_initialized` (Boolean)
+
+### Read-Only
+
+- `endpoint` (String) Cluster API server endpoint
+- `id` (String) The ID of this resource.
 
 <a id="nestedblock--configuration"></a>
 ### Nested Schema for `configuration`
 
 Optional:
 
-- **enable_csi_driver** (Boolean)
-- **enable_nginx_ingress** (Boolean)
+- `enable_nginx_ingress` (Boolean)
 
 
 <a id="nestedblock--timeouts"></a>
@@ -49,6 +52,6 @@ Optional:
 
 Optional:
 
-- **create** (String)
+- `create` (String)
 
 

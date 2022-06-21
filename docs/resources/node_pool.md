@@ -31,12 +31,12 @@ resource "symbiosis_node_pool" "example" {
 
 ### Required
 
-- **cluster** (String) Name of cluster to create node pool in.
-- **node_type** (String) Type of nodes for this specific pool, see docs.
-- **quantity** (Number) Desired number of nodes for specific pool.
+- `cluster` (String) Name of cluster to create node pool in.
+- `node_type` (String) Type of nodes for this specific pool, see docs.
+- `quantity` (Number) Desired number of nodes for specific pool.
 
 ### Read-Only
 
-- **id** (String) ID of node pool.
+- `id` (String) ID of node pool.
 
 

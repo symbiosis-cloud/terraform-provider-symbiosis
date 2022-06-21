@@ -3,9 +3,10 @@ package symbiosis
 import (
 	"context"
 	"fmt"
-	"github.com/symbiosis-cloud/symbiosis-go"
 	"log"
 	"time"
+
+	"github.com/symbiosis-cloud/symbiosis-go"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -35,17 +36,15 @@ func ResourceCluster() *schema.Resource {
 				Description: "Kubernetes version, see symbiosis.host for valid values or \"latest\" for the most recent supported version.",
 			},
 			"region": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Cluster region, valid values: [eu-germany-1].",
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 			"wait_until_initialized": {
-				Type:        schema.TypeBool,
-				Default:     false,
-				ForceNew:    true,
-				Optional:    true,
-				Description: "Wait until Kubernetes cluster is initialized.",
+				Type:     schema.TypeBool,
+				Default:  false,
+				ForceNew: true,
+				Optional: true,
 			},
 			"configuration": {
 				Type:     schema.TypeSet,
@@ -61,6 +60,11 @@ func ResourceCluster() *schema.Resource {
 						},
 					},
 				},
+			},
+			"endpoint": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Cluster API server endpoint",
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
@@ -159,6 +163,8 @@ func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if cluster != nil {
 		d.Set("name", cluster.Name)
 		d.Set("state", cluster.State)
+		d.Set("endpoint", cluster.APIServerEndpoint)
+
 	} else {
 		d.SetId("")
 	}
