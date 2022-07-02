@@ -5,9 +5,9 @@ provider "symbiosis" {
 provider "kubernetes" {
     host = "https://${symbiosis_cluster.production.endpoint}"
 
-    client_certificate = symbiosis_cluster.production.identity.0.certificate
-    client_key = symbiosis_cluster.production.identity.0.private_key
-    cluster_ca_certificate = symbiosis_cluster.production.identity.0.ca_certificate
+    client_certificate = symbiosis_cluster.production.certificate
+    client_key = symbiosis_cluster.production.private_key
+    cluster_ca_certificate = symbiosis_cluster.production.ca_certificate
 }
 
 resource "symbiosis_cluster" "production" {

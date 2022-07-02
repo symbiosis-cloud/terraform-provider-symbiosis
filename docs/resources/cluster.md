@@ -16,9 +16,9 @@ Manages Kubernetes clusters.
 provider "kubernetes" {
     host = "https://${symbiosis_cluster.production.endpoint}"
 
-    client_certificate = symbiosis_cluster.example.identity.0.certificate
-    client_key = symbiosis_cluster.example.identity.0.private_key
-    cluster_ca_certificate = symbiosis_cluster.example.identity.0.ca_certificate
+    client_certificate = symbiosis_cluster.example.certificate
+    client_key = symbiosis_cluster.example.private_key
+    cluster_ca_certificate = symbiosis_cluster.example.ca_certificate
 }
 
 resource "symbiosis_cluster" "example" {
@@ -39,14 +39,15 @@ resource "symbiosis_cluster" "example" {
 
 - `configuration` (Block Set) (see [below for nested schema](#nestedblock--configuration))
 - `kube_version` (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
-- `node_pools` (Block List) Default node pools (see [below for nested schema](#nestedblock--node_pools))
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
+- `ca_certificate` (String, Sensitive)
+- `certificate` (String, Sensitive)
 - `endpoint` (String) Cluster API server endpoint
 - `id` (String) The ID of this resource.
-- `identity` (List of Object, Sensitive) (see [below for nested schema](#nestedatt--identity))
+- `private_key` (String, Sensitive)
 
 <a id="nestedblock--configuration"></a>
 ### Nested Schema for `configuration`
@@ -56,30 +57,11 @@ Optional:
 - `enable_nginx_ingress` (Boolean)
 
 
-<a id="nestedblock--node_pools"></a>
-### Nested Schema for `node_pools`
-
-Required:
-
-- `node_type` (String) Type of nodes for this specific pool, see docs.
-- `quantity` (Number) Desired number of nodes for specific pool.
-
-
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
 
 Optional:
 
 - `create` (String)
-
-
-<a id="nestedatt--identity"></a>
-### Nested Schema for `identity`
-
-Read-Only:
-
-- `ca_certificate` (String)
-- `certificate` (String)
-- `private_key` (String)
 
 

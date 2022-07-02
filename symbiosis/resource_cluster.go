@@ -61,26 +61,20 @@ func ResourceCluster() *schema.Resource {
 				Computed:    true,
 				Description: "Cluster API server endpoint",
 			},
-			"identity": {
-				Type:      schema.TypeList,
+			"certificate": {
+				Type:      schema.TypeString,
 				Computed:  true,
 				Sensitive: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"certificate": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"ca_certificate": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"private_key": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
-				},
+			},
+			"ca_certificate": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+			},
+			"private_key": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
@@ -185,23 +179,14 @@ func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta inter
 		d.Set("name", cluster.Name)
 		d.Set("state", cluster.State)
 		d.Set("endpoint", cluster.APIServerEndpoint)
-		d.Set("identity", flattenIdentity(identity))
+		d.Set("certificate", identity.CertificatePem)
+		d.Set("ca_certificate", identity.ClusterCertificateAuthorityPem)
+		d.Set("private_key", identity.PrivateKeyPem)
+
 	} else {
 		d.SetId("")
 	}
 
 	var diags diag.Diagnostics
 	return diags
-}
-
-func flattenIdentity(identity *symbiosis.ClusterIdentity) []map[string]interface{} {
-	result := make([]map[string]interface{}, 0)
-	item := make(map[string]interface{})
-
-	item["certificate"] = identity.CertificatePem
-	item["ca_certificate"] = identity.ClusterCertificateAuthorityPem
-	item["private_key"] = identity.PrivateKeyPem
-	result = append(result, item)
-
-	return result
 }

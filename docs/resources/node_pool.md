@@ -32,11 +32,26 @@ resource "symbiosis_node_pool" "example" {
 ### Required
 
 - `cluster` (String) Name of cluster to create node pool in.
+- `name` (String) Name of node pool
 - `node_type` (String) Type of nodes for this specific pool, see docs.
 - `quantity` (Number) Desired number of nodes for specific pool.
+
+### Optional
+
+- `labels` (Map of String) Node labels to be applied to the nodes
+- `taint` (Block Set) Node taints to be applied to the nodes (see [below for nested schema](#nestedblock--taint))
 
 ### Read-Only
 
 - `id` (String) ID of node pool.
+
+<a id="nestedblock--taint"></a>
+### Nested Schema for `taint`
+
+Required:
+
+- `effect` (String)
+- `key` (String)
+- `value` (String)
 
 
