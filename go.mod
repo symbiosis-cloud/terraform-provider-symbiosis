@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.7.0
-	github.com/symbiosis-cloud/symbiosis-go v1.0.3
+	github.com/symbiosis-cloud/symbiosis-go v1.0.6
 )
 
 require (

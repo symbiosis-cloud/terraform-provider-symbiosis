@@ -4,8 +4,10 @@ provider "symbiosis" {
 
 provider "kubernetes" {
     host = "https://${symbiosis_cluster.production.endpoint}"
-    token = symbiosis_cluster_service_account.example.token
-    cluster_ca_certificate = symbiosis_cluster_service_account.example.cluster_ca_certificate
+
+    client_certificate = symbiosis_cluster.production.identity.0.certificate
+    client_key = symbiosis_cluster.production.identity.0.private_key
+    cluster_ca_certificate = symbiosis_cluster.production.identity.0.ca_certificate
 }
 
 resource "symbiosis_cluster" "production" {
@@ -17,7 +19,7 @@ resource "symbiosis_node_pool" "example" {
   cluster = symbiosis_cluster.production.name
 
   node_type = "general-int-1"
-  quantity = 6
+  quantity = 3
 }
 
 resource "symbiosis_team_member" "admins" {
