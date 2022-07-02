@@ -2,6 +2,14 @@ provider "symbiosis" {
   api_key = "YOUR_SYMBIOSIS_API_KEY"
 }
 
+provider "kubernetes" {
+    host = "https://${symbiosis_cluster.production.endpoint}"
+
+    client_certificate = symbiosis_cluster.production.certificate
+    client_key = symbiosis_cluster.production.private_key
+    cluster_ca_certificate = symbiosis_cluster.production.ca_certificate
+}
+
 resource "symbiosis_cluster" "production" {
   name = "production-cluster"
   region = "germany-1"
@@ -9,9 +17,9 @@ resource "symbiosis_cluster" "production" {
 
 resource "symbiosis_node_pool" "example" {
   cluster = symbiosis_cluster.production.name
-  
+
   node_type = "general-int-1"
-  quantity = 6
+  quantity = 3
 }
 
 resource "symbiosis_team_member" "admins" {
@@ -20,3 +28,6 @@ resource "symbiosis_team_member" "admins" {
   role = "ADMIN"
 }
 
+resource "symbiosis_cluster_service_account" "example" {
+  cluster_name = symbiosis_cluster.production.name
+}

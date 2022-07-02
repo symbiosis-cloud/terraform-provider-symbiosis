@@ -3,9 +3,11 @@ package symbiosis
 import (
 	"context"
 	"fmt"
-	"github.com/symbiosis-cloud/symbiosis-go"
 	"log"
+	"strings"
 	"time"
+
+	"github.com/symbiosis-cloud/symbiosis-go"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -35,17 +37,9 @@ func ResourceCluster() *schema.Resource {
 				Description: "Kubernetes version, see symbiosis.host for valid values or \"latest\" for the most recent supported version.",
 			},
 			"region": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Cluster region, valid values: [eu-germany-1].",
-			},
-			"wait_until_initialized": {
-				Type:        schema.TypeBool,
-				Default:     false,
-				ForceNew:    true,
-				Optional:    true,
-				Description: "Wait until Kubernetes cluster is initialized.",
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 			"configuration": {
 				Type:     schema.TypeSet,
@@ -62,6 +56,26 @@ func ResourceCluster() *schema.Resource {
 					},
 				},
 			},
+			"endpoint": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Cluster API server endpoint",
+			},
+			"certificate": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+			},
+			"ca_certificate": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+			},
+			"private_key": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(10 * time.Minute),
@@ -71,7 +85,7 @@ func ResourceCluster() *schema.Resource {
 
 func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] Creating cluster: %s", d.Get("name").(string))
-	var diags diag.Diagnostics
+
 	client := meta.(*symbiosis.Client)
 
 	configurationInput := symbiosis.ClusterConfigurationInput{
@@ -93,27 +107,26 @@ func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta int
 	}
 
 	d.SetId(cluster.Name)
+	d.Set("name", cluster.Name)
 
-	if d.Get("wait_until_initialized").(bool) {
-		err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-			c, err := client.Cluster.Describe(cluster.Name)
+	err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		c, err := client.Cluster.Describe(cluster.Name)
 
-			if err != nil {
-				return resource.NonRetryableError(fmt.Errorf("Error describing cluster: %s", err))
-			}
-
-			if c.State != "ACTIVE" {
-				return resource.RetryableError(fmt.Errorf("expected instance to be active but was in state %s", c.State))
-			}
-
-			return nil
-		})
 		if err != nil {
-			return diag.FromErr(err)
+			return resource.NonRetryableError(fmt.Errorf("Error describing cluster: %s", err))
 		}
+
+		if c.State != "ACTIVE" {
+			return resource.RetryableError(fmt.Errorf("expected instance to be active but was in state %s", c.State))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
-	return diags
+	return resourceClusterRead(ctx, d, meta)
 }
 
 func resourceClusterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -126,23 +139,22 @@ func resourceClusterDelete(ctx context.Context, d *schema.ResourceData, meta int
 	}
 
 	var diags diag.Diagnostics
-	if d.Get("wait_until_initialized").(bool) {
-		err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-			c, err := client.Cluster.Describe(d.Id())
 
-			if err != nil {
-				return resource.NonRetryableError(fmt.Errorf("Error describing cluster: %s", err))
-			}
+	err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		c, err := client.Cluster.Describe(d.Id())
 
-			if c != nil {
-				return resource.RetryableError(fmt.Errorf("expected cluster to get removed but cluster is still returned from api"))
-			}
-
-			return nil
-		})
-		if err != nil {
-			return diag.FromErr(err)
+		if err != nil && !strings.Contains(err.Error(), "404") {
+			return resource.NonRetryableError(fmt.Errorf("Error describing cluster: %s", err))
 		}
+
+		if c != nil {
+			return resource.RetryableError(fmt.Errorf("expected cluster to get removed but cluster is still returned from api"))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	return diags
@@ -153,12 +165,24 @@ func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta inter
 	client := meta.(*symbiosis.Client)
 
 	cluster, err := client.Cluster.Describe(d.Id())
+	if err != nil && !strings.Contains(err.Error(), "404") {
+		return diag.FromErr(err)
+	}
+
+	identity, err := client.Cluster.GetIdentity(d.Id())
+
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	if cluster != nil {
 		d.Set("name", cluster.Name)
 		d.Set("state", cluster.State)
+		d.Set("endpoint", cluster.APIServerEndpoint)
+		d.Set("certificate", identity.CertificatePem)
+		d.Set("ca_certificate", identity.ClusterCertificateAuthorityPem)
+		d.Set("private_key", identity.PrivateKeyPem)
+
 	} else {
 		d.SetId("")
 	}

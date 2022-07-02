@@ -4,11 +4,10 @@ go 1.17
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.7.0
-	github.com/symbiosis-cloud/symbiosis-go v0.0.0-20220514211403-9d30dc8660fa
+	github.com/symbiosis-cloud/symbiosis-go v1.0.6
 )
 
 require (
-    github.com/go-resty/resty/v2 v2.7.0 // indirect
 	cloud.google.com/go v0.61.0 // indirect
 	cloud.google.com/go/storage v1.10.0 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
@@ -18,6 +17,7 @@ require (
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
+	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect

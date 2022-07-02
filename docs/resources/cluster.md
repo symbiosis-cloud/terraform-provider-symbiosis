@@ -13,6 +13,14 @@ Manages Kubernetes clusters.
 ## Example Usage
 
 ```terraform
+provider "kubernetes" {
+    host = "https://${symbiosis_cluster.production.endpoint}"
+
+    client_certificate = symbiosis_cluster.example.certificate
+    client_key = symbiosis_cluster.example.private_key
+    cluster_ca_certificate = symbiosis_cluster.example.ca_certificate
+}
+
 resource "symbiosis_cluster" "example" {
   name = "my-production-cluster"
   region = "germany-1"
@@ -24,24 +32,29 @@ resource "symbiosis_cluster" "example" {
 
 ### Required
 
-- **name** (String) Cluster name. Changing the name forces re-creation.
-- **region** (String) Cluster region, valid values: [eu-germany-1].
+- `name` (String) Cluster name. Changing the name forces re-creation.
+- `region` (String)
 
 ### Optional
 
-- **configuration** (Block Set) (see [below for nested schema](#nestedblock--configuration))
-- **id** (String) The ID of this resource.
-- **kube_version** (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
-- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- **wait_until_initialized** (Boolean) Wait until Kubernetes cluster is initialized.
+- `configuration` (Block Set) (see [below for nested schema](#nestedblock--configuration))
+- `kube_version` (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+
+### Read-Only
+
+- `ca_certificate` (String, Sensitive)
+- `certificate` (String, Sensitive)
+- `endpoint` (String) Cluster API server endpoint
+- `id` (String) The ID of this resource.
+- `private_key` (String, Sensitive)
 
 <a id="nestedblock--configuration"></a>
 ### Nested Schema for `configuration`
 
 Optional:
 
-- **enable_csi_driver** (Boolean)
-- **enable_nginx_ingress** (Boolean)
+- `enable_nginx_ingress` (Boolean)
 
 
 <a id="nestedblock--timeouts"></a>
@@ -49,6 +62,6 @@ Optional:
 
 Optional:
 
-- **create** (String)
+- `create` (String)
 
 
