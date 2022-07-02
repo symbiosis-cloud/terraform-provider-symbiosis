@@ -50,7 +50,7 @@ resource "symbiosis_node_pool" "example" {
 
 Required:
 
-- `effect` (String)
+- `effect` (String) Taint effect. Can be either NoSchedule, PreferNoSchedule or NoExecute. See: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 - `key` (String)
 - `value` (String)
 

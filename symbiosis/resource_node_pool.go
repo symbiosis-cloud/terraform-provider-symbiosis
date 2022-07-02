@@ -68,8 +68,9 @@ func ResourceNodePool() *schema.Resource {
 						Required: true,
 					},
 					"effect": {
-						Type:     schema.TypeString,
-						Required: true,
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "Taint effect. Can be either NoSchedule, PreferNoSchedule or NoExecute. See: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/",
 						ValidateFunc: validation.StringInSlice([]string{
 							string(symbiosis.EFFECT_NO_SCHEDULE),
 							string(symbiosis.EFFECT_NO_EXECUTE),
