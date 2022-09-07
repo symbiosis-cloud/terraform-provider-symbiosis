@@ -46,7 +46,7 @@ func ResourceCluster() *schema.Resource {
 				ForceNew:    true,
 				Optional:    true,
 				Default:     false,
-				Description: "When set to true, it will deploy a highly available control plane.",
+				Description: "When set to true it will deploy a highly available control plane with multiple replicas for redundancy.",
 			},
 			"endpoint": {
 				Type:        schema.TypeString,
