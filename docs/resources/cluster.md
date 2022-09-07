@@ -37,7 +37,7 @@ resource "symbiosis_cluster" "example" {
 
 ### Optional
 
-- `is_highly_available` (Boolean) When set to true, it will deploy a highly available control plane.
+- `is_highly_available` (Boolean) When set to true it will deploy a highly available control plane with multiple replicas for redundancy.
 - `kube_version` (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
