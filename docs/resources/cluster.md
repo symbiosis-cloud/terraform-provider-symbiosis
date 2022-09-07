@@ -37,7 +37,7 @@ resource "symbiosis_cluster" "example" {
 
 ### Optional
 
-- `configuration` (Block Set) (see [below for nested schema](#nestedblock--configuration))
+- `is_highly_available` (Boolean) When set to true it will deploy a highly available control plane with multiple replicas for redundancy.
 - `kube_version` (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
@@ -48,14 +48,6 @@ resource "symbiosis_cluster" "example" {
 - `endpoint` (String) Cluster API server endpoint
 - `id` (String) The ID of this resource.
 - `private_key` (String, Sensitive)
-
-<a id="nestedblock--configuration"></a>
-### Nested Schema for `configuration`
-
-Optional:
-
-- `enable_nginx_ingress` (Boolean)
-
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
