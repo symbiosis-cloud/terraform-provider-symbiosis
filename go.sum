@@ -300,8 +300,8 @@ github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.1 h1:5TQK59W5E3v0r2duFAb7P95B6hEeOyEnHRa8MjYSMTY=
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/symbiosis-cloud/symbiosis-go v1.0.6 h1:Tie5nN9Jz8cuMPxcolctDl9jj9fnJ3MRLDTDm/q1rME=
-github.com/symbiosis-cloud/symbiosis-go v1.0.6/go.mod h1:lhSbsfDioup2qFsrvUemxiUJLuP2hAE3q4umblBzWOo=
+github.com/symbiosis-cloud/symbiosis-go v1.0.8 h1:ZHP7LNMGb/t6+Cb0xwXxnVpkzBxjDluu2rtsaFf4w5Q=
+github.com/symbiosis-cloud/symbiosis-go v1.0.8/go.mod h1:lhSbsfDioup2qFsrvUemxiUJLuP2hAE3q4umblBzWOo=
 github.com/ulikunitz/xz v0.5.8 h1:ERv8V6GKqVi23rgu5cj9pVfVzJbOqAY2Ntl88O6c2nQ=
 github.com/ulikunitz/xz v0.5.8/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=

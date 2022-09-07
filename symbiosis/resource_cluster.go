@@ -41,20 +41,12 @@ func ResourceCluster() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"configuration": {
-				Type:     schema.TypeSet,
-				ForceNew: true,
-				Optional: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"enable_nginx_ingress": {
-							Type:     schema.TypeBool,
-							Default:  false,
-							ForceNew: true,
-							Optional: true,
-						},
-					},
-				},
+			"is_highly_available": {
+				Type:        schema.TypeBool,
+				ForceNew:    true,
+				Optional:    true,
+				Default:     false,
+				Description: "When set to true, it will deploy a highly available control plane.",
 			},
 			"endpoint": {
 				Type:        schema.TypeString,
@@ -88,16 +80,12 @@ func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta int
 
 	client := meta.(*symbiosis.Client)
 
-	configurationInput := symbiosis.ClusterConfigurationInput{
-		EnableNginxIngress: d.Get("configuration.0.enable_nginx_ingress").(bool),
-	}
-
 	input := &symbiosis.ClusterInput{
-		Name:          d.Get("name").(string),
-		Region:        d.Get("region").(string),
-		KubeVersion:   d.Get("kube_version").(string),
-		Nodes:         []symbiosis.ClusterNodeInput{},
-		Configuration: configurationInput,
+		Name:              d.Get("name").(string),
+		Region:            d.Get("region").(string),
+		KubeVersion:       d.Get("kube_version").(string),
+		Nodes:             []symbiosis.ClusterNodeInput{},
+		IsHighlyAvailable: d.Get("is_highly_available").(bool),
 	}
 
 	cluster, err := client.Cluster.Create(input)
@@ -179,6 +167,7 @@ func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta inter
 		d.Set("name", cluster.Name)
 		d.Set("state", cluster.State)
 		d.Set("endpoint", cluster.APIServerEndpoint)
+		d.Set("is_highly_available", cluster.IsHighlyAvailable)
 		d.Set("certificate", identity.CertificatePem)
 		d.Set("ca_certificate", identity.ClusterCertificateAuthorityPem)
 		d.Set("private_key", identity.PrivateKeyPem)
