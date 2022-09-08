@@ -40,13 +40,16 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
       -
+        name: export tty
+        run: |
+          export GPG_TTY=$(tty)
+
+      -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v3.1.0
         with:
           version: latest
+          args: release --rm-dist
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          export GPG_TTY=$(tty)
-          goreleaser release --rm-dist
