@@ -37,13 +37,16 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
       -
-        name: Run GoReleaser
+        name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
-          version: latest
-          args: release --rm-dist
+          install-only: true
+      -
+        name: Run GoReleaser
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-          # GitHub sets this automatically
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export GPG_TTY=$(tty)
+          goreleaser release --rm-dist
 
