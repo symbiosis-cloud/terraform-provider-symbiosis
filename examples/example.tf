@@ -3,22 +3,22 @@ provider "symbiosis" {
 }
 
 provider "kubernetes" {
-    host = "https://${symbiosis_cluster.production.endpoint}"
+    host = "https://${symbiosis_cluster.example.endpoint}"
 
-    client_certificate = symbiosis_cluster.production.certificate
-    client_key = symbiosis_cluster.production.private_key
-    cluster_ca_certificate = symbiosis_cluster.production.ca_certificate
+    client_certificate = symbiosis_cluster.example.certificate
+    client_key = symbiosis_cluster.example.private_key
+    cluster_ca_certificate = symbiosis_cluster.example.ca_certificate
 }
 
-resource "symbiosis_cluster" "production" {
-  name = "production-cluster"
+resource "symbiosis_cluster" "example" {
+  name = "my-production-cluster"
   region = "germany-1"
 }
 
 resource "symbiosis_node_pool" "example" {
-  cluster = symbiosis_cluster.production.name
+  cluster = symbiosis_cluster.example.name
 
-  node_type = "general-int-1"
+  node_type = "general-1"
   quantity = 3
 }
 

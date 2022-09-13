@@ -6,6 +6,6 @@ resource "symbiosis_cluster" "example" {
 resource "symbiosis_node_pool" "example" {
   cluster = symbiosis_cluster.example.name
 
-  node_type = "general-int-1"
+  node_type = "general-1"
   quantity = 6
 }
