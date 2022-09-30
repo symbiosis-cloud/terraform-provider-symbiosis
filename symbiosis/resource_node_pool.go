@@ -80,6 +80,30 @@ func ResourceNodePool() *schema.Resource {
 				},
 			},
 		},
+		"autoscaling": {
+			Type:     schema.TypeSet,
+			ForceNew: false,
+			MaxItems: 1,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Required: true,
+					},
+					"min_size": {
+						Type:         schema.TypeInt,
+						ValidateFunc: validation.IntAtLeast(2),
+						Required:     true,
+					},
+					"max_size": {
+						Type:         schema.TypeInt,
+						ValidateFunc: validation.IntAtMost(100),
+						Required:     true,
+					},
+				},
+			},
+		},
 	}
 
 	return &schema.Resource{
@@ -101,6 +125,8 @@ func resourceNodePoolCreate(ctx context.Context, d *schema.ResourceData, meta in
 	labels := expandLabels(d.Get("labels").(map[string]interface{}))
 	taints := expandTaints(d.Get("taint").(*schema.Set).List())
 
+	autoscaling := getAutoscalingSettings(d)
+
 	input := &symbiosis.NodePoolInput{
 		Name:         d.Get("name").(string),
 		ClusterName:  d.Get("cluster").(string),
@@ -108,6 +134,7 @@ func resourceNodePoolCreate(ctx context.Context, d *schema.ResourceData, meta in
 		Quantity:     d.Get("quantity").(int),
 		Labels:       labels,
 		Taints:       taints,
+		Autoscaling:  autoscaling,
 	}
 
 	resp, err := client.NodePool.Create(input)
@@ -125,8 +152,13 @@ func resourceNodePoolUpdate(ctx context.Context, d *schema.ResourceData, meta in
 	var diags diag.Diagnostics
 	client := meta.(*symbiosis.Client)
 
+	autoscaling := getAutoscalingSettings(d)
+
+	log.Printf("[DEBUG] Updating node pool: %v", autoscaling)
+
 	input := &symbiosis.NodePoolUpdateInput{
-		Quantity: d.Get("quantity").(int),
+		Quantity:    d.Get("quantity").(int),
+		Autoscaling: autoscaling,
 	}
 	err := client.NodePool.Update(d.Id(), input)
 	if err != nil {
@@ -164,6 +196,7 @@ func resourceNodePoolRead(ctx context.Context, d *schema.ResourceData, meta inte
 		d.Set("quantity", nodePool.DesiredQuantity)
 		d.Set("labels", flattenLabels(nodePool.Labels))
 		d.Set("taints", flattenedTaints(nodePool.Taints))
+		d.Set("autoscaling", flattenAutoscalingSettings(nodePool.Autoscaling))
 	} else {
 		d.SetId("")
 	}
@@ -229,4 +262,33 @@ func flattenedTaints(input []symbiosis.NodeTaint) []interface{} {
 	}
 
 	return taints
+}
+
+func flattenAutoscalingSettings(input symbiosis.AutoscalingSettings) []interface{} {
+	settings := make([]interface{}, 0)
+
+	setting := map[string]interface{}{
+		"enabled":  input.Enabled,
+		"min_size": input.MinSize,
+		"max_size": input.MaxSize,
+	}
+
+	settings = append(settings, setting)
+
+	return settings
+}
+
+func getAutoscalingSettings(d *schema.ResourceData) symbiosis.AutoscalingSettings {
+	settings := d.Get("autoscaling").(*schema.Set).List()
+
+	if len(settings) == 0 {
+		return symbiosis.AutoscalingSettings{}
+	}
+
+	settingsMap := settings[0].(map[string]interface{})
+	return symbiosis.AutoscalingSettings{
+		Enabled: settingsMap["enabled"].(bool),
+		MinSize: settingsMap["min_size"].(int),
+		MaxSize: settingsMap["max_size"].(int),
+	}
 }

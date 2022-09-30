@@ -38,12 +38,23 @@ resource "symbiosis_node_pool" "example" {
 
 ### Optional
 
+- `autoscaling` (Block Set, Max: 1) (see [below for nested schema](#nestedblock--autoscaling))
 - `labels` (Map of String) Node labels to be applied to the nodes
 - `taint` (Block Set) Node taints to be applied to the nodes (see [below for nested schema](#nestedblock--taint))
 
 ### Read-Only
 
 - `id` (String) ID of node pool.
+
+<a id="nestedblock--autoscaling"></a>
+### Nested Schema for `autoscaling`
+
+Required:
+
+- `enabled` (Boolean)
+- `max_size` (Number)
+- `min_size` (Number)
+
 
 <a id="nestedblock--taint"></a>
 ### Nested Schema for `taint`
