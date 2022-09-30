@@ -21,13 +21,3 @@ resource "symbiosis_node_pool" "example" {
   node_type = "general-1"
   quantity = 3
 }
-
-resource "symbiosis_team_member" "admins" {
-  for_each = toset(["sara@mycorp.com", "john@mycorp.com"])
-  email = each.value
-  role = "ADMIN"
-}
-
-resource "symbiosis_cluster_service_account" "example" {
-  cluster_name = symbiosis_cluster.production.name
-}
