@@ -205,12 +205,12 @@ func resourceNodePoolRead(ctx context.Context, d *schema.ResourceData, meta inte
 	return diags
 }
 
-func expandTaints(taints []interface{}) []symbiosis.NodeTaint {
-	convertedTaints := make([]symbiosis.NodeTaint, 0, len(taints))
+func expandTaints(taints []interface{}) []*symbiosis.NodeTaint {
+	convertedTaints := make([]*symbiosis.NodeTaint, 0, len(taints))
 	for _, taint := range taints {
 		input := taint.(map[string]interface{})
 
-		t := symbiosis.NodeTaint{
+		t := &symbiosis.NodeTaint{
 			Key:    input["key"].(string),
 			Value:  input["value"].(string),
 			Effect: symbiosis.SchedulerEffect(input["effect"].(string)),
@@ -222,8 +222,8 @@ func expandTaints(taints []interface{}) []symbiosis.NodeTaint {
 	return convertedTaints
 }
 
-func expandLabels(labels map[string]interface{}) []symbiosis.NodeLabel {
-	convertedLabels := make([]symbiosis.NodeLabel, 0, len(labels))
+func expandLabels(labels map[string]interface{}) []*symbiosis.NodeLabel {
+	convertedLabels := make([]*symbiosis.NodeLabel, 0, len(labels))
 
 	for key, value := range labels {
 		newLabel := &symbiosis.NodeLabel{
@@ -231,7 +231,7 @@ func expandLabels(labels map[string]interface{}) []symbiosis.NodeLabel {
 			Value: value.(string),
 		}
 
-		convertedLabels = append(convertedLabels, *newLabel)
+		convertedLabels = append(convertedLabels, newLabel)
 	}
 
 	return convertedLabels
