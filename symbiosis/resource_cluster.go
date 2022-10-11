@@ -157,6 +157,8 @@ func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta inter
 		return diag.FromErr(err)
 	}
 
+	log.Printf("[DEBUG] Cluster resource: %v", cluster)
+
 	identity, err := client.Cluster.GetIdentity(d.Id())
 
 	if err != nil {
