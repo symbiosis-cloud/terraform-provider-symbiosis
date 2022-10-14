@@ -125,7 +125,7 @@ func resourceNodePoolCreate(ctx context.Context, d *schema.ResourceData, meta in
 	labels := expandLabels(d.Get("labels").(map[string]interface{}))
 	taints := expandTaints(d.Get("taint").(*schema.Set).List())
 
-	autoscaling := getAutoscalingSettings(d)
+	autoscaling := expandAutoscalingSettings(d.Get("autoscaling").(*schema.Set).List())
 
 	input := &symbiosis.NodePoolInput{
 		Name:         d.Get("name").(string),
@@ -152,7 +152,7 @@ func resourceNodePoolUpdate(ctx context.Context, d *schema.ResourceData, meta in
 	var diags diag.Diagnostics
 	client := meta.(*symbiosis.Client)
 
-	autoscaling := getAutoscalingSettings(d)
+	autoscaling := expandAutoscalingSettings(d.Get("autoscaling").(*schema.Set).List())
 
 	log.Printf("[DEBUG] Updating node pool: %v", autoscaling)
 
@@ -205,12 +205,12 @@ func resourceNodePoolRead(ctx context.Context, d *schema.ResourceData, meta inte
 	return diags
 }
 
-func expandTaints(taints []interface{}) []*symbiosis.NodeTaint {
-	convertedTaints := make([]*symbiosis.NodeTaint, 0, len(taints))
+func expandTaints(taints []interface{}) []symbiosis.NodeTaint {
+	convertedTaints := make([]symbiosis.NodeTaint, 0, len(taints))
 	for _, taint := range taints {
 		input := taint.(map[string]interface{})
 
-		t := &symbiosis.NodeTaint{
+		t := symbiosis.NodeTaint{
 			Key:    input["key"].(string),
 			Value:  input["value"].(string),
 			Effect: symbiosis.SchedulerEffect(input["effect"].(string)),
@@ -222,8 +222,8 @@ func expandTaints(taints []interface{}) []*symbiosis.NodeTaint {
 	return convertedTaints
 }
 
-func expandLabels(labels map[string]interface{}) []*symbiosis.NodeLabel {
-	convertedLabels := make([]*symbiosis.NodeLabel, 0, len(labels))
+func expandLabels(labels map[string]interface{}) []symbiosis.NodeLabel {
+	convertedLabels := make([]symbiosis.NodeLabel, 0, len(labels))
 
 	for key, value := range labels {
 		newLabel := &symbiosis.NodeLabel{
@@ -231,13 +231,13 @@ func expandLabels(labels map[string]interface{}) []*symbiosis.NodeLabel {
 			Value: value.(string),
 		}
 
-		convertedLabels = append(convertedLabels, newLabel)
+		convertedLabels = append(convertedLabels, *newLabel)
 	}
 
 	return convertedLabels
 }
 
-func flattenLabels(labels []symbiosis.NodeLabel) map[string]interface{} {
+func flattenLabels(labels []*symbiosis.NodeLabel) map[string]interface{} {
 	flattenedLabels := make(map[string]interface{})
 	for _, label := range labels {
 		flattenedLabels[label.Key] = label.Value
@@ -245,7 +245,7 @@ func flattenLabels(labels []symbiosis.NodeLabel) map[string]interface{} {
 	return flattenedLabels
 }
 
-func flattenedTaints(input []symbiosis.NodeTaint) []interface{} {
+func flattenedTaints(input []*symbiosis.NodeTaint) []interface{} {
 	taints := make([]interface{}, 0)
 	if input == nil {
 		return taints
@@ -277,12 +277,9 @@ func flattenAutoscalingSettings(input symbiosis.AutoscalingSettings) []interface
 
 	return settings
 }
-
-func getAutoscalingSettings(d *schema.ResourceData) symbiosis.AutoscalingSettings {
-	settings := d.Get("autoscaling").(*schema.Set).List()
-
+func expandAutoscalingSettings(settings []interface{}) symbiosis.AutoscalingSettings {
 	if len(settings) == 0 {
-		return symbiosis.AutoscalingSettings{}
+		return symbiosis.AutoscalingSettings{Enabled: false, MinSize: 0, MaxSize: 0}
 	}
 
 	settingsMap := settings[0].(map[string]interface{})
