@@ -9,6 +9,13 @@ import (
 	"github.com/symbiosis-cloud/symbiosis-go"
 )
 
+const (
+	nameCluster               = "symbiosis_cluster"
+	nameNodePool              = "symbiosis_node_pool"
+	nameTeamMember            = "symbiosis_team_member"
+	nameClusterServiceAccount = "symbiosis_cluster_service_account"
+)
+
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -27,12 +34,14 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"symbiosis_cluster":                 ResourceCluster(),
-			"symbiosis_node_pool":               ResourceNodePool(),
-			"symbiosis_team_member":             ResourceTeamMember(),
-			"symbiosis_cluster_service_account": ResourceClusterServiceAccount(),
+			nameCluster:               ResourceCluster(),
+			nameNodePool:              ResourceNodePool(),
+			nameTeamMember:            ResourceTeamMember(),
+			nameClusterServiceAccount: ResourceClusterServiceAccount(),
 		},
-		DataSourcesMap:       map[string]*schema.Resource{},
+		DataSourcesMap: map[string]*schema.Resource{
+			nameCluster: dataSourceCluster(),
+		},
 		ConfigureContextFunc: configureContext,
 	}
 }
