@@ -93,7 +93,7 @@ func ResourceNodePool() *schema.Resource {
 					},
 					"min_size": {
 						Type:         schema.TypeInt,
-						ValidateFunc: validation.IntAtLeast(2),
+						ValidateFunc: validation.IntAtLeast(0),
 						Required:     true,
 					},
 					"max_size": {
