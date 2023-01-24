@@ -68,6 +68,12 @@ func ResourceCluster() *schema.Resource {
 				Computed:  true,
 				Sensitive: true,
 			},
+			"kubeconfig": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+				Description: "The raw kubeconfig file.",
+			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(10 * time.Minute),
@@ -84,7 +90,7 @@ func resourceClusterCreate(ctx context.Context, d *schema.ResourceData, meta int
 		Name:              d.Get("name").(string),
 		Region:            d.Get("region").(string),
 		KubeVersion:       d.Get("kube_version").(string),
-		Nodes:             []symbiosis.ClusterNodeInput{},
+		Nodes:             []symbiosis.ClusterNodePoolInput{},
 		IsHighlyAvailable: d.Get("is_highly_available").(bool),
 	}
 
@@ -173,6 +179,7 @@ func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta inter
 		d.Set("certificate", identity.CertificatePem)
 		d.Set("ca_certificate", identity.ClusterCertificateAuthorityPem)
 		d.Set("private_key", identity.PrivateKeyPem)
+		d.Set("kubeconfig", identity.KubeConfig)
 
 	} else {
 		d.SetId("")
