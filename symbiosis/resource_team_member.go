@@ -44,7 +44,7 @@ func resourceTeamMemberCreate(ctx context.Context, d *schema.ResourceData, meta 
 	client := meta.(*symbiosis.Client)
 	email := d.Get("email").(string)
 
-	_, err := client.Team.InviteMembers([]string{email}, d.Get("role").(string))
+	_, err := client.Team.InviteMembers([]string{email}, symbiosis.UserRole(d.Get("role").(string)))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -58,7 +58,7 @@ func resourceTeamMemberUpdate(ctx context.Context, d *schema.ResourceData, meta 
 	client := meta.(*symbiosis.Client)
 	if d.HasChange("role") {
 
-		err := client.Team.ChangeRole(d.Id(), d.Get("role").(string))
+		err := client.Team.ChangeRole(d.Id(), symbiosis.UserRole(d.Get("role").(string)))
 
 		if err != nil {
 			return diag.FromErr(err)
