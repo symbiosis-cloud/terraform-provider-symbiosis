@@ -4,7 +4,7 @@ NAMESPACE ?= symbiosis
 NAME      ?= symbiosis
 BINARY    ?= terraform-provider-${NAME}
 VERSION   ?= $(shell cat ./VERSION)
-OS_ARCH   ?= darwin_arm64
+OS_ARCH   ?= $(shell bash -c "uname | tr '[:upper:]' '[:lower:]'")_$(shell arch)
 
 default: install
 
