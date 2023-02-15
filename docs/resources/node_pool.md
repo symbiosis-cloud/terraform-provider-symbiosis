@@ -31,29 +31,29 @@ resource "symbiosis_node_pool" "example" {
 
 ### Required
 
-- `cluster` (String) Name of cluster to create node pool in.
-- `name` (String) Name of node pool
-- `node_type` (String) Type of nodes for this specific pool, see docs.
-- `quantity` (Number) Desired number of nodes for specific pool.
+- **cluster** (String) Name of cluster to create node pool in.
+- **name** (String) Name of node pool
+- **node_type** (String) Type of nodes for this specific pool, see docs.
+- **quantity** (Number) Desired number of nodes for specific pool.
 
 ### Optional
 
-- `autoscaling` (Block Set, Max: 1) (see [below for nested schema](#nestedblock--autoscaling))
-- `labels` (Map of String) Node labels to be applied to the nodes
-- `taint` (Block Set) Node taints to be applied to the nodes (see [below for nested schema](#nestedblock--taint))
+- **autoscaling** (Block Set, Max: 1) (see [below for nested schema](#nestedblock--autoscaling))
+- **labels** (Map of String) Node labels to be applied to the nodes
+- **taint** (Block Set) Node taints to be applied to the nodes (see [below for nested schema](#nestedblock--taint))
 
 ### Read-Only
 
-- `id` (String) ID of node pool.
+- **id** (String) ID of node pool.
 
 <a id="nestedblock--autoscaling"></a>
 ### Nested Schema for `autoscaling`
 
 Required:
 
-- `enabled` (Boolean)
-- `max_size` (Number)
-- `min_size` (Number)
+- **enabled** (Boolean)
+- **max_size** (Number)
+- **min_size** (Number)
 
 
 <a id="nestedblock--taint"></a>
@@ -61,8 +61,8 @@ Required:
 
 Required:
 
-- `effect` (String) Taint effect. Can be either NoSchedule, PreferNoSchedule or NoExecute. See: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-- `key` (String)
-- `value` (String)
+- **effect** (String) Taint effect. Can be either NoSchedule, PreferNoSchedule or NoExecute. See: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+- **key** (String)
+- **value** (String)
 
 

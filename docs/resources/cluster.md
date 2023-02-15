@@ -32,28 +32,29 @@ resource "symbiosis_cluster" "example" {
 
 ### Required
 
-- `name` (String) Cluster name. Changing the name forces re-creation.
-- `region` (String)
+- **name** (String) Cluster name. Changing the name forces re-creation.
+- **region** (String)
 
 ### Optional
 
-- `is_highly_available` (Boolean) When set to true it will deploy a highly available control plane with multiple replicas for redundancy.
-- `kube_version` (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
-- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- **id** (String) The ID of this resource.
+- **is_highly_available** (Boolean) When set to true it will deploy a highly available control plane with multiple replicas for redundancy.
+- **kube_version** (String) Kubernetes version, see symbiosis.host for valid values or "latest" for the most recent supported version.
+- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
-- `ca_certificate` (String, Sensitive)
-- `certificate` (String, Sensitive)
-- `endpoint` (String) Cluster API server endpoint
-- `id` (String) The ID of this resource.
-- `private_key` (String, Sensitive)
+- **ca_certificate** (String, Sensitive)
+- **certificate** (String, Sensitive)
+- **endpoint** (String) Cluster API server endpoint
+- **kubeconfig** (String, Sensitive) The raw kubeconfig file.
+- **private_key** (String, Sensitive)
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
 
 Optional:
 
-- `create` (String)
+- **create** (String)
 
 

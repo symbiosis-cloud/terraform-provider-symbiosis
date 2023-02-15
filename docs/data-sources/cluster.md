@@ -17,17 +17,20 @@ Describes a Kubernetes cluster.
 
 ### Required
 
-- `name` (String) Cluster name.
+- **name** (String) Cluster name.
+
+### Optional
+
+- **id** (String) The ID of this resource.
 
 ### Read-Only
 
-- `ca_certificate` (String, Sensitive)
-- `certificate` (String, Sensitive)
-- `endpoint` (String) Cluster API server endpoint
-- `id` (String) The ID of this resource.
-- `is_highly_available` (Boolean) If set to true, control plane is deployed with multiple replicas for redundancy.
-- `kube_version` (String) Kubernetes version.
-- `private_key` (String, Sensitive)
-- `state` (String) Cluster state.
+- **ca_certificate** (String, Sensitive)
+- **certificate** (String, Sensitive)
+- **endpoint** (String) Cluster API server endpoint
+- **is_highly_available** (Boolean) If set to true, control plane is deployed with multiple replicas for redundancy.
+- **kube_version** (String) Kubernetes version.
+- **private_key** (String, Sensitive)
+- **state** (String) Cluster state.
 
 

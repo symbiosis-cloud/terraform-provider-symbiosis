@@ -23,23 +23,23 @@ resource "symbiosis_cluster_service_account" "example" {
 
 ### Required
 
-- `cluster_name` (String) Cluster name. Changing the name forces re-creation.
+- **cluster_name** (String) Cluster name. Changing the name forces re-creation.
 
 ### Optional
 
-- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- **id** (String) The ID of this resource.
+- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
-- `cluster_ca_certificate` (String, Sensitive) Cluster CA certificate
-- `id` (String) The ID of this resource.
-- `token` (String, Sensitive) Service account token
+- **cluster_ca_certificate** (String, Sensitive) Cluster CA certificate
+- **token** (String, Sensitive) Service account token
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
 
 Optional:
 
-- `create` (String)
+- **create** (String)
 
 
