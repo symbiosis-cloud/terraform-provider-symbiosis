@@ -2,6 +2,7 @@ package symbiosis
 
 import (
 	"context"
+	"fmt"
 
 	"log"
 
@@ -40,8 +41,8 @@ func ResourceNodePool() *schema.Resource {
 		},
 		"quantity": {
 			Type:        schema.TypeInt,
-			Description: "Desired number of nodes for specific pool.",
-			Required:    true,
+			Description: "Desired number of nodes for specific pool. Optional if autoscaling is enabled.",
+			Optional:    true,
 		},
 		"labels": {
 			Type:        schema.TypeMap,
@@ -113,6 +114,21 @@ func ResourceNodePool() *schema.Resource {
 		UpdateContext: resourceNodePoolUpdate,
 		DeleteContext: resourceNodePoolDelete,
 		Schema:        resourceSchema,
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, i interface{}) error {
+			if d.HasChange("autoscaling") {
+				autoscaling := expandAutoscalingSettings(d.Get("autoscaling").(*schema.Set).List())
+				if autoscaling.Enabled {
+					// quantity is optional when autoscaling is enabled
+					d.SetNew("quantity", 0)
+				} else {
+					quantity, ok := d.GetOk("quantity")
+					if !ok || quantity.(int) < 1 {
+						return fmt.Errorf("Quantity must be at least 1 if autoscaling is disabled")
+					}
+				}
+			}
+			return nil
+		},
 	}
 }
 
@@ -156,11 +172,25 @@ func resourceNodePoolUpdate(ctx context.Context, d *schema.ResourceData, meta in
 
 	log.Printf("[DEBUG] Updating node pool: %v", autoscaling)
 
+	id := d.Id()
+	currentNodePool, err := client.NodePool.Describe(id)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	quantity := d.Get("quantity").(int)
+
+	// if autoscaling is enabled we don't have to update the quantity
+	if autoscaling.Enabled {
+		quantity = currentNodePool.DesiredQuantity
+	}
+
 	input := &symbiosis.NodePoolUpdateInput{
-		Quantity:    d.Get("quantity").(int),
+		Quantity:    quantity,
 		Autoscaling: autoscaling,
 	}
-	err := client.NodePool.Update(d.Id(), input)
+	err = client.NodePool.Update(id, input)
 	if err != nil {
 		return diag.FromErr(err)
 	}
