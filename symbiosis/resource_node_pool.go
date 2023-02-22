@@ -115,18 +115,17 @@ func ResourceNodePool() *schema.Resource {
 		DeleteContext: resourceNodePoolDelete,
 		Schema:        resourceSchema,
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, i interface{}) error {
-			if d.HasChange("autoscaling") {
-				autoscaling := expandAutoscalingSettings(d.Get("autoscaling").(*schema.Set).List())
-				if autoscaling.Enabled {
-					// quantity is optional when autoscaling is enabled
-					d.SetNew("quantity", 0)
-				} else {
-					quantity, ok := d.GetOk("quantity")
-					if !ok || quantity.(int) < 1 {
-						return fmt.Errorf("Quantity must be at least 1 if autoscaling is disabled")
-					}
+			autoscaling := expandAutoscalingSettings(d.Get("autoscaling").(*schema.Set).List())
+			if autoscaling.Enabled {
+				// quantity is optional when autoscaling is enabled
+				d.SetNew("quantity", 0)
+			} else {
+				quantity, ok := d.GetOk("quantity")
+				if !ok || quantity.(int) < 1 {
+					return fmt.Errorf("Quantity must be at least 1 if autoscaling is disabled")
 				}
 			}
+
 			return nil
 		},
 	}
