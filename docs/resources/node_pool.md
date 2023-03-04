@@ -23,6 +23,7 @@ resource "symbiosis_node_pool" "example" {
 
   node_type = "general-1"
   quantity = 6
+  name = "example-pool"
 }
 ```
 
