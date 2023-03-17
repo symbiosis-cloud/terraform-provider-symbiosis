@@ -18,6 +18,9 @@ func ResourceTeamMember() *schema.Resource {
 		ReadContext:   resourceTeamMemberRead,
 		DeleteContext: resourceTeamMemberDelete,
 		UpdateContext: resourceTeamMemberUpdate,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"email": {
 				Type:        schema.TypeString,

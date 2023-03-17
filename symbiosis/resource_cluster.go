@@ -22,6 +22,9 @@ func ResourceCluster() *schema.Resource {
 		CreateContext: resourceClusterCreate,
 		ReadContext:   resourceClusterRead,
 		DeleteContext: resourceClusterDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -48,6 +51,11 @@ func ResourceCluster() *schema.Resource {
 				Default:     false,
 				Description: "When set to true it will deploy a highly available control plane with multiple replicas for redundancy.",
 			},
+			"state": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Cluster state [PENDING, DELETE_IN_PROGRESS, ACTIVE, FAILED]",
+			},
 			"endpoint": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -69,9 +77,9 @@ func ResourceCluster() *schema.Resource {
 				Sensitive: true,
 			},
 			"kubeconfig": {
-				Type:      schema.TypeString,
-				Computed:  true,
-				Sensitive: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
 				Description: "The raw kubeconfig file.",
 			},
 		},

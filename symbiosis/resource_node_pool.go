@@ -113,7 +113,10 @@ func ResourceNodePool() *schema.Resource {
 		ReadContext:   resourceNodePoolRead,
 		UpdateContext: resourceNodePoolUpdate,
 		DeleteContext: resourceNodePoolDelete,
-		Schema:        resourceSchema,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
+		Schema: resourceSchema,
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, i interface{}) error {
 			autoscaling := expandAutoscalingSettings(d.Get("autoscaling").(*schema.Set).List())
 			if autoscaling.Enabled {
