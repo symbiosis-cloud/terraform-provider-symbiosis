@@ -183,6 +183,7 @@ func resourceClusterRead(ctx context.Context, d *schema.ResourceData, meta inter
 		d.Set("name", cluster.Name)
 		d.Set("state", cluster.State)
 		d.Set("endpoint", cluster.APIServerEndpoint)
+		d.Set("region", cluster.Region.Name)
 		d.Set("is_highly_available", cluster.IsHighlyAvailable)
 		d.Set("certificate", identity.CertificatePem)
 		d.Set("ca_certificate", identity.ClusterCertificateAuthorityPem)
