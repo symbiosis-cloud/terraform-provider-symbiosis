@@ -49,6 +49,7 @@ resource "symbiosis_cluster" "example" {
 - **endpoint** (String) Cluster API server endpoint
 - **kubeconfig** (String, Sensitive) The raw kubeconfig file.
 - **private_key** (String, Sensitive)
+- **state** (String) Cluster state [PENDING, DELETE_IN_PROGRESS, ACTIVE, FAILED]
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
